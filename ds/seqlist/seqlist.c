@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "seqlist.h"
@@ -34,6 +35,46 @@ void seqlistTraval(const seqlist_t *s, pri_t pri)
 		pri((char *)s->p + i*s->size);
 	}
 }
+
+void seqlistDestroy(seqlist_t *s)
+{
+	free(s->p);
+	free(s);
+}
+
+// 返回所要查找的元素的地址
+static void *__find(const seqlist_t *s, const void *key, cmp_t cmp)
+{
+	int i;
+
+	for (i = 0; i < s->nmemb; i++)
+		if (cmp((char *)s->p+i*s->size, key) == 0)
+			return (char *)s->p + i*s->size;
+
+	return NULL;
+}
+
+int seqlistDel(seqlist_t *s, const void *key, cmp_t cmp)
+{
+	void *f;
+	char *end, *delNext;
+
+	f = __find(s, key, cmp);	
+	if (NULL == f)
+		return -1;
+	end = (char *)s->p+(s->nmemb*s->size);
+	delNext = (char *)f+s->size;
+	memcpy(f, (char *)f+s->size, \
+			end-delNext);
+	s->nmemb--;
+	s->p = realloc(s->p, s->nmemb*s->size);
+	if (NULL == s->p)
+		return -1;
+	
+	return 0;
+}
+
+
 
 
 

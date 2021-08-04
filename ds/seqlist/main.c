@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "seqlist.h"
 
 #define NAMESIZE	32
@@ -15,6 +16,14 @@ static void showStu(const void *data)
 	printf("%s %d\n", d->name, d->age);
 }
 
+static int nameCmp(const void *data, const void *key)
+{
+	const struct stu_st *d = data;
+	const char *k = key;
+
+	return strcmp(d->name, k);
+}
+
 int main(void)
 {
 	seqlist_t *sl = NULL;
@@ -24,6 +33,7 @@ int main(void)
 		{"张悦", 19}
 	};
 	int i;
+	char *delName = "张悦";
 
 	seqlistInit(&sl, sizeof(struct stu_st));
 
@@ -32,6 +42,12 @@ int main(void)
 	}
 
 	seqlistTraval(sl, showStu);
+
+	printf("删除一个元素后\n");
+	seqlistDel(sl, delName, nameCmp);
+	seqlistTraval(sl, showStu);
+
+	seqlistDestroy(sl);
 
 	return 0;
 }

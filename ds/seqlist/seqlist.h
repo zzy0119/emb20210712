@@ -12,6 +12,7 @@ typedef struct {
 }seqlist_t;
 
 typedef void (*pri_t)(const void *data);
+typedef int (*cmp_t)(const void *data, const void *key);
 
 /*
 初始化顺序表结构:创建seqlist_t结构
@@ -32,10 +33,21 @@ return :
 int seqlistAdd(seqlist_t *s, const void *data);
 
 /*
- 遍历
+ 删除顺序表中指定元素
+ */
+int seqlistDel(seqlist_t *s, const void *key, cmp_t cmp);
 
+/*
+ 遍历
  */
 void seqlistTraval(const seqlist_t *s, pri_t pri);
+
+/*
+ 查找指定元素
+ */
+
+// 销毁
+void seqlistDestroy(seqlist_t *s);
 
 #endif
 
