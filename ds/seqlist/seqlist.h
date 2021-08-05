@@ -33,6 +33,12 @@ return :
 int seqlistAdd(seqlist_t *s, const void *data);
 
 /*
+ 插排
+ 有序插入
+ */
+int seqlistInsertSort(seqlist_t *s, const void *data, cmp_t cmp);
+
+/*
  删除顺序表中指定元素
  */
 int seqlistDel(seqlist_t *s, const void *key, cmp_t cmp);
@@ -45,9 +51,13 @@ void seqlistTraval(const seqlist_t *s, pri_t pri);
 /*
  查找指定元素
  */
+void *seqlistSearch(const seqlist_t *s, const void *key, cmp_t cmp);
 
 // 销毁
 void seqlistDestroy(seqlist_t *s);
+
+// 折半查找
+void *seqlistFastFind(const seqlist_t *s, const void *key, cmp_t cmp);
 
 #endif
 

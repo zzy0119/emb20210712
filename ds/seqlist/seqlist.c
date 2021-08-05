@@ -74,9 +74,55 @@ int seqlistDel(seqlist_t *s, const void *key, cmp_t cmp)
 	return 0;
 }
 
+void *seqlistSearch(const seqlist_t *s, const void *key, cmp_t cmp)
+{
+	void *f;		
 
+	f = __find(s, key, cmp);
+	return f;
+}
 
+int seqlistInsertSort(seqlist_t *s, const void *data, cmp_t cmp)
+{
+	int i;
 
+	s->p = realloc(s->p, (s->nmemb + 1) * s->size);
+	if (NULL == s->p)
+		return -1;
+	for (i = 0; i < s->nmemb; i++) {
+		if (cmp((char *)s->p + i*s->size, data) > 0) {
+			break;	
+		}
+	}
+	memmove((char *)s->p+(i+1)*s->size, \
+			(char *)s->p+i*s->size, (s->nmemb-i)*s->size);	
+	memcpy((char *)s->p+i*s->size, data, s->size);
+	s->nmemb++;
+
+	return 0;
+}
+
+void *seqlistFastFind(const seqlist_t *s, const void *key, cmp_t cmp)
+{
+	int mid, left, right;	
+	int ret;
+
+	left = 0; // 待查找序列起始下标
+	right = s->nmemb - 1; // 最大下标
+
+	while (left <= right) {
+		mid = (left + right) / 2;
+		ret = cmp((char *)s->p + mid * s->size, key);
+		if (ret == 0)
+			return (char *)s->p + mid * s->size;
+		else if (ret > 0) 
+			right = mid - 1;
+		else
+			left = mid + 1;
+	}
+
+	return NULL;
+}
 
 
 
