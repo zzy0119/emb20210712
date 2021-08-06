@@ -69,6 +69,70 @@ void listDestroy(listhead_t *l)
 	free(l);
 }
 
+static struct node_st *__delNodePrev(const listhead_t *l, const void *key, cmp_t cmp)
+{
+	struct node_st *prev, *cur;
+	
+	prev = &l->head;
+	cur = prev->next;
+
+	while (cur != &l->head) {
+		if (cmp(cur->data, key) == 0)
+			return prev;
+		prev = cur;
+		cur = cur->next;
+	}
+
+	return NULL;
+}
+
+int listDelete(listhead_t *l, const void *key, cmp_t cmp)
+{
+	struct node_st *prev, *del;
+
+	prev = __delNodePrev(l, key, cmp);
+	if (NULL == prev)
+		return -1;
+
+	del = prev->next;
+	prev->next = del->next;
+	del->next = NULL;
+	free(del->data);
+	free(del);
+
+	return 0;
+}
+
+// 查找
+void *listSearch(const listhead_t *l, const void *key, cmp_t cmp)
+{
+	struct node_st *prev;
+
+	prev = __delNodePrev(l, key, cmp);
+	if (NULL == prev)
+		return NULL;
+	return prev->next->data;
+}
+
+static void __insertHead(listhead_t *l, struct node_st *newFirst)
+{
+	newFirst->next = l->head.next;
+	l->head.next = newFirst;
+}
+
+void listReverse(listhead_t *l)
+{
+	struct node_st *second, *first;		
+
+	first = l->head.next;
+	second = first->next;
+	while (first->next != &l->head) {
+		first->next = second->next;	
+		second->next = NULL;
+		__insertHead(l, second);
+		second = first->next;
+	}
+}
 
 
 
