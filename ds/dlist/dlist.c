@@ -1,0 +1,86 @@
+#include <stdlib.h>
+#include <string.h>
+
+#include "dlist.h"
+
+int dlistHeadInit(dlist_t **dl, int size)
+{
+	*dl = malloc(sizeof(dlist_t));
+	if (NULL ==  *dl)
+		return -1;
+	(*dl)->head.data = NULL;
+	(*dl)->head.prev = (*dl)->head.next = &(*dl)->head;
+	(*dl)->size = size;
+
+	return 0;
+}
+
+static int __insert(struct node_st *front, struct node_st *behind, struct node_st *new)
+{
+	new->prev = front;
+	new->next = behind;
+	front->next = new;
+	behind->prev = new;
+
+	return 0;
+}
+
+int dlistInsert(dlist_t *dl, const void *data, int way)
+{
+	struct node_st *new;
+
+	new = malloc(sizeof(struct node_st));
+	if (NULL == new)
+		return -1;
+	new->data = malloc(dl->size);
+	if (NULL == new->data) {
+		free(new);
+		return -1;
+	}
+	memcpy(new->data, data, dl->size);
+
+	if (way == DLISTHEADINSERT)
+		__insert(&dl->head, dl->head.next, new);
+	else if (way == DLISTTAILINSERT)
+		__insert(dl->head.prev, &dl->head, new);
+	else {
+		free(new->data);
+		free(new);
+		return -1;
+	}
+
+	return 0;
+}
+
+void dlistTraval(const dlist_t *dl, print_t pri)
+{
+	struct node_st *cur;	
+
+	for (cur = dl->head.next; cur != &dl->head; cur = cur->next) {
+		pri(cur->data);
+	}
+}
+
+static void __destroy(struct node_st *del)
+{
+	del->prev->next = del->next;
+	del->next->prev = del->prev;
+	del->prev = del->next = NULL;
+
+	free(del->data);
+	free(del);
+}
+
+void dlistDestroy(dlist_t *dl)
+{
+	struct node_st *del;	
+
+	del = dl->head.next;
+	while (del != &dl->head) {
+		__destroy(del);
+		del = dl->head.next;
+	}
+
+	free(dl);
+}
+
