@@ -84,3 +84,52 @@ void dlistDestroy(dlist_t *dl)
 	free(dl);
 }
 
+static struct node_st *__search(const dlist_t *dl, const void *key, cmp_t cmp)
+{
+	struct node_st *cur;
+
+	for (cur = dl->head.next; cur != &dl->head; cur = cur->next)
+		if (cmp(cur->data, key) == 0)
+			return cur;
+	return NULL;
+}
+
+int dlistDelete(dlist_t *dl, const void *key, cmp_t cmp)
+{
+	struct node_st *f;
+
+	f = __search(dl, key, cmp);
+	if (NULL == f)
+		return -1;
+	__destroy(f);
+
+	return 0;
+}
+
+void *dlistSearch(const dlist_t *dl, const void *key, cmp_t cmp)
+{
+	struct node_st *f;
+
+	f = __search(dl, key, cmp);
+	if (NULL == f)
+		return NULL;
+
+	return f->data;
+}
+
+void *dlistFindMidNode(const dlist_t *dl)
+{
+	struct node_st *slow, *fast;
+
+	slow = fast = dl->head.next;
+	while (fast != &dl->head || fast->next != &dl->head) {
+		slow = slow->next;
+		fast = fast->next->next;
+	}
+
+	return slow->data;
+}
+
+
+
+

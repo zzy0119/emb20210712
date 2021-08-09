@@ -28,5 +28,11 @@ int dlistDelete(dlist_t *dl, const void *key, cmp_t cmp);
 
 void *dlistSearch(const dlist_t *dl, const void *key, cmp_t cmp);
 
+/*
+ 写一段代码，返回链表中最中间的结点的数据
+ 要求链表只能遍历一次
+ */
+void *dlistFindMidNode(const dlist_t *dl);
+
 #endif
 
