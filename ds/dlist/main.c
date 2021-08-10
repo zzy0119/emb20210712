@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "dlist.h"
 
@@ -17,13 +18,21 @@ static void showPeron(const void *data)
 	printf("%s %d\n", d->name, d->age);
 }
 
+static int nameCmp(const void *data1, const void *data2)
+{
+	const person_t *d1 = data1;
+	const person_t *d2 = data2;
+
+	return strcmp(d2->name, d1->name);
+}
+
 int main(void)
 {
 	dlist_t *list;
 	person_t p[N] = {
-		{"于元飞", 21},
-		{"冯浩然", 20},
-		{"安晓宣", 19}
+		{"yuyuanfei", 21},
+		{"fenghaoran", 20},
+		{"anxiaoxuan", 19}
 	};
 	int i;
 
@@ -32,6 +41,9 @@ int main(void)
 	for (i = 0; i < N; i++) {
 		dlistInsert(list, p+i, DLISTTAILINSERT);	
 	}
+	dlistTraval(list, showPeron);
+
+	dlistSort(list, nameCmp);
 	dlistTraval(list, showPeron);
 
 	dlistDestroy(list);

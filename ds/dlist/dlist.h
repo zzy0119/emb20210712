@@ -34,5 +34,7 @@ void *dlistSearch(const dlist_t *dl, const void *key, cmp_t cmp);
  */
 void *dlistFindMidNode(const dlist_t *dl);
 
+void dlistSort(dlist_t *dl, cmp_t cmp);
+
 #endif
 

@@ -130,6 +130,35 @@ void *dlistFindMidNode(const dlist_t *dl)
 	return slow->data;
 }
 
+static void __sort(struct node_st *front, struct node_st *behind, struct node_st *mid)
+{
+	mid->prev = front;
+	mid->next = behind;
+	front->next = mid;
+	behind->prev = mid;
+}
 
+void dlistSort(dlist_t *dl, cmp_t cmp)
+{
+	// 选择排序
+	struct node_st *start, *every;
+	struct node_st *max;
+	struct node_st *maxFront, *maxBehind;
+
+	for (start = dl->head.next; start != &dl->head; start = start->next) {
+		max = start;
+		for (every = start->next; every != &dl->head; every = every->next) {
+			if (cmp(every->data, max->data) > 0)
+				max = every;
+		}
+		if (max != start) {
+			maxFront = max->prev;	
+			maxBehind = max->next;
+			__sort(start->prev, start->next, max);
+			__sort(maxFront, maxBehind, start);
+		}
+	}
+	
+}
 
 
