@@ -52,7 +52,7 @@ char *infixToPostfixExpression(const char *ptr)
 	len = strlen(ptr);
 
 	// 运算符
-	stackInit(&s, len, sizeof(char));
+	stackInit(&s, sizeof(char), len);
 	// 结果队列
 	q = queueInit(len+1, sizeof(char));
 
@@ -64,12 +64,10 @@ char *infixToPostfixExpression(const char *ptr)
 					enq(q, &popElm);	
 				} else {
 					// 栈顶运算符优先级低于要入栈元素
-					printf("[%d]%c\n", __LINE__, popElm);
 					stackPush(s, &popElm);
 					break;
 				}
 			}
-			printf("[%d]%c\n", __LINE__, *ptr);
 			stackPush(s, ptr);	
 		} else if (isNumber(*ptr))
 			enq(q, ptr);
@@ -91,7 +89,6 @@ char *infixToPostfixExpression(const char *ptr)
 
 	while (!stackIsEmpty(s)) {
 		stackPop(s, &popElm);
-		printf("%c\n", popElm);
 		enq(q, &popElm);
 	}
 
