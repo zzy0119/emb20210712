@@ -200,6 +200,12 @@ static inline void list_rotate_left(struct list_head *head)
 	}
 }
 
+#define offsetof(TYPE, MEMBER)	((size_t)&((TYPE *)0)->MEMBER)
+
+#define container_of(ptr, type, member) ({				\
+	char *__mptr = (char *)(ptr);					\
+	((type *)(__mptr - offsetof(type, member))); })
+
 
 /**
  * list_entry - get the struct for this entry
