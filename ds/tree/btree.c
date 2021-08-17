@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "btree.h"
 
@@ -26,6 +27,7 @@ static int __insert(struct node_st **root, const void *data, cmp_t cmp, int size
 			return -1;
 		}
 		memcpy(new->data, data, size);
+		new->left = new->right = NULL;
 		*root = new;
 		return 0;
 	}
@@ -71,4 +73,49 @@ void treeDestroy(btree_t *tree)
 	__destroy(&tree->root);
 	free(tree);
 }
-	
+
+static struct node_st *findMaxNode(const struct node_st *root)
+{
+	if (root == NULL)
+		return NULL;
+	if (root->right == NULL)
+		return root;
+	return findMaxNode(root->right);
+}
+
+static int  __delete(struct node_st **root, const void *key, cmp_t cmp)
+{
+	int ret;
+	if (*root == NULL)	
+		return -1;
+	ret = cmp((*root)->data, key);
+	if (ret == 0) {
+		struct node_st *l, *r;	
+		l = (*root)->left;
+		r = (*root)->right;
+
+		free((*root)->data);
+		free((*root));
+		if (l != NULL) {
+			*root = l;
+			findMaxNode(l)->right = r;	
+		} else {
+			*root = r;	
+		}
+		return 0;
+	}
+	if (ret > 0) {
+		return __delete(&(*root)->left, key, cmp);
+	} else {
+		return __delete(&(*root)->right, key, cmp);
+	}
+}
+
+int treeDelete(btree_t *tree, const void *key, cmp_t cmp)
+{
+	__delete(&tree->root, key, cmp);
+}
+
+
+
+
