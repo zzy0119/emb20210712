@@ -1,0 +1,11 @@
+
+1. 总结
+文件描述符
+open(2) / read(2) / write(2) / lseek(2) / close(2) / dup(2) / dup2(2)
+内核对于已打开文件三张表结构关系
+
+2.将argv[1]文件的第argv[2]行行首写入argv[3]
+
+./a.out hello 3 "good night"
+
+ 
