@@ -9,3 +9,31 @@
  <4>int findMax(int *p, int n, int *max);
  *max是回填的最大值
  */
+#include <stdio.h>
+#include "intArr.h"
+
+int main(int argc, char **argv)
+{
+	int *arr = NULL;
+	int n = 0;
+	int m;
+
+	if (argc < 2)
+		return 1;
+	for (int i = 0; argv[1][i]; i++) {
+		add(&arr, &n, argv[1][i]);
+	}
+	traval(arr, n);
+
+	if (argc >= 3) {
+		for (int i = 0; argv[2][i]; i++)
+			del(&arr, &n, argv[2][i]);
+	}
+	traval(arr, n);
+
+	findMax(arr, n, &m);
+	printf("%d\n", m);
+
+	return 0;
+}
+
