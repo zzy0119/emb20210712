@@ -99,3 +99,55 @@ void seqlistDestroy(seqlist_t *s)
 	free(s);
 }
 
+void seqlistSort(seqlist_t *s, cmp_t cmp)
+{
+	int i, j;
+	int min;
+	void *tmp = malloc(s->size);
+
+	for (i = 0; i < s->nmemb - 1; i++) {
+		min = i;	
+		for (j = i + 1; j < s->nmemb; j++) {
+			if (cmp((char *)s->start + j * s->size, \
+						(char *)s->start + min * s->size) < 0)
+				min = j;
+		}
+		if (min != i) {
+			memcpy(tmp, (char *)s->start + i * s->size, s->size);	
+			memcpy((char *)s->start + i * s->size, \
+					(char *)s->start + min * s->size, s->size);
+			memcpy((char *)s->start + min * s->size, tmp, s->size);
+		}
+	}
+	free(tmp);
+}
+
+void *seqlistBinarySearch(const seqlist_t *s, const void *key, cmp_t cmp)
+{
+	int low, high, mid;		
+	int ret;
+	
+	low = 0;
+	high = s->nmemb-1;
+
+	while (low <= high) {
+		mid = (low + high) / 2;
+		ret = cmp((char *)s->start + mid * s->size, key);
+		if (ret > 0) {
+			high = mid - 1;	
+		} else if (ret < 0) {
+			low = mid + 1;
+		} else 
+			return (char *)s->start + mid * s->size;
+	}
+		
+	return NULL;
+}
+
+
+
+
+
+
+
+

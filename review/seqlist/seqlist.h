@@ -24,7 +24,11 @@ void seqlistTraval(const seqlist_t *s, pri_t pri);
 
 int seqlistSortInsert(seqlist_t *s, const void *data, cmp_t cmp);
 
+void seqlistSort(seqlist_t *s, cmp_t cmp);
+
 void seqlistDestroy(seqlist_t *s);
+
+void *seqlistBinarySearch(const seqlist_t *s, const void *data, cmp_t cmp);
 
 #endif
 

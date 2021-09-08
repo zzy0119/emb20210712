@@ -30,7 +30,8 @@ int main(int argc, char *argv[])
 	seqlistInit(&list, sizeof(char), 2);
 
 	for (i = 0; argv[1][i]; i++)
-		seqlistSortInsert(list, argv[1]+i, charCmp);
+		// seqlistSortInsert(list, argv[1]+i, charCmp);
+		seqlistInsert(list, argv[1] + i);
 #undef 	DEBUG
 #ifndef DEBUG
 	printf("[%d]debug...\n", __LINE__);
@@ -42,6 +43,9 @@ int main(int argc, char *argv[])
 
 	char del = 'e';
 	seqlistDelete(list, &del, charCmp);
+
+	seqlistSort(list, charCmp);
+
 	seqlistTraval(list, show);
 
 	seqlistDestroy(list);

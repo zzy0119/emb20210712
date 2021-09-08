@@ -55,7 +55,22 @@ int findMax(int *p, int n, int *max)
 	return 0;
 }
 
+int addSort(int **p, int *n, int elm)
+{
+	int i;
 
+	*p = realloc(*p, (*n + 1) * sizeof(int));
+	// if error
+	for (i = 0; i < *n; i++) {
+		if ((*p)[i] > elm)
+			break;
+	}
+	memove(*p + i + 1, *p + i, (*n - i) * sizeof(int));	
+	(*p)[i] = elm;
+	(*n)++;
+	
+	return 0;
+}
 
 
 
