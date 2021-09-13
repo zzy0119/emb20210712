@@ -1,0 +1,20 @@
+1.将argv[1]文件偏移argv[2]的元素后，写入argv[3]
+./a.out /etc/passwd 2 ./test
+
+2.将argv[1]文件倒序写入argv[2]
+
+3.将argv[1]文件每一行按空格和换行切割出来每一个字符串写入argv[2]
+的每一行
+字符串切割strtok(3)
+hello     world
+hi
+good night
+
+argv[2]
+hello
+world
+hi
+good
+night
+
+

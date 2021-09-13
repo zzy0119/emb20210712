@@ -7,14 +7,29 @@
 
 #define BUFSIZE	10
 
+int mycpy(int sfd, int dfd);
 int mycat(const char *path);
+int cpFile(const char *rpath, const char *wpath);
 int main(int argc, char *argv[])
 {
-	if (argc < 2)
+	if (argc < 3)
 		return 1;
 	mycat(argv[1]);
 
+	cpFile(argv[1], argv[2]);
+
 	return 0;	
+}
+
+int cpFile(const char *rpath, const char *wpath)
+{
+	int rfd = open(rpath, O_RDONLY);
+	//if error
+	int wfd = open(wpath, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	
+	mycpy(rfd, wfd);
+
+	return 0;
 }
 
 int mycpy(int sfd, int dfd)
