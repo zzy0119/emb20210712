@@ -33,12 +33,20 @@ int mycopy(FILE *rfd, FILE *wfd)
 		}
 		fputc(ch, wfd);
 #endif
+#if 0
 		if (fgets(buf, BUFSIZE, rfd) == NULL) {
 			if (ferror(rfd))
 				return -1;
 			break;
 		}
 		fputs(buf, wfd);
+#endif
+		if ((ch = fread(buf, 1, BUFSIZE, rfd)) == 0) {
+			if (ferror(rfd))
+				return -1;
+			break;
+		}
+		fwrite(buf, 1, ch, wfd);
 	}
 
 	return 0;
