@@ -4,6 +4,54 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
+#include <time.h>
+
+#define BUFSIZE	128	
+
+static const char *fileTime(struct timespec mtime, const char *format)
+{
+	static char buf[BUFSIZE] = {};
+
+	struct tm *tmp = localtime(&mtime.tv_sec);
+	if (NULL == tmp)
+		return NULL;
+	strftime(buf, BUFSIZE, format, tmp);
+
+	return buf;
+}
+
+static int fileBlocks(blkcnt_t blk)
+{
+	return blk / 2;
+}
+
+static int fileSize(off_t size)
+{
+	return size;
+}
+
+static const char *fileGroup(gid_t gid)
+{
+	struct group *grp = getgrgid(gid);
+	if (NULL == grp)
+		return NULL;
+	return grp->gr_name;
+}
+
+static const char *fileOwner(uid_t uid)
+{
+	struct passwd *pwd = getpwuid(uid);
+	if (NULL == pwd)
+		return NULL;
+	return pwd->pw_name;
+}
+
+static int fileNlink(nlink_t n)
+{
+	return n;
+}
 
 static char fileType(mode_t mode)
 {
@@ -54,7 +102,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	printf("%c%s\n", fileType(res.st_mode), fileMode(res.st_mode));
+	printf("%c%s %d %s %s %d %s\n", fileType(res.st_mode), fileMode(res.st_mode), fileNlink(res.st_nlink), fileOwner(res.st_uid), \
+			fileGroup(res.st_gid), fileSize(res.st_size),\
+			fileTime(res.st_mtim, "%m月 %d %H:%M"));
 
 	return 0;
 }
