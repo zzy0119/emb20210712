@@ -8,7 +8,51 @@
 #include <grp.h>
 #include <time.h>
 
-#define BUFSIZE	128	
+#define BUFSIZE		128	
+#define OPTSTRING	"-lah"
+
+#define F_ISL		0001 // -l
+#define F_ISA		0002 // -a
+#define F_ISH		0004
+#define F_NONOPT	0010 // 000 001 000
+
+typedef short opt_t;
+static int nonoptInd;
+
+// static opt_t mode;
+
+static void setBit(opt_t *opt, int n)
+{
+	*opt = *opt | 1u << n;
+}
+
+static int parseOpt(int argc, char *argv[], opt_t *opt)
+{
+	int c;
+
+	while (1) {
+		c = getopt(argc, argv, OPTSTRING);
+		if (c == -1)
+			break;
+		switch (c) {
+			case 'a':
+				setBit(opt, 1);
+				break;
+			case 'l':
+				setBit(opt, 0);
+				break;
+			case 'h':
+				setBit(opt, 2);
+				break;
+			case 1:
+				setBit(opt, 3);
+				nonoptInd = optind - 1;
+				break;
+			default:
+				break;
+		}
+	}
+}
 
 static const char *fileTime(struct timespec mtime, const char *format)
 {
@@ -94,17 +138,39 @@ static char *fileMode(mode_t mode)
 int main(int argc, char *argv[])
 {
 	struct stat res;
-	if (argc < 2)
-		return 1;
+	opt_t mode = 0;
 
-	if (stat(argv[1], &res) == -1) {
-		perror("stat()");
-		return 1;
+	parseOpt(argc, argv, &mode);
+
+	if (mode & F_NONOPT) {
+		if (stat(argv[nonoptInd], &res) == -1) {
+			perror("stat()");
+			return 1;
+		}
+
+#if 0
+		printf("%c%s %d %s %s %d %s\n", fileType(res.st_mode), fileMode(res.st_mode), fileNlink(res.st_nlink), fileOwner(res.st_uid), \
+				fileGroup(res.st_gid), fileSize(res.st_size),\
+				fileTime(res.st_mtim, "%m月 %d %H:%M"));
+#endif
+
+		if (mode & F_ISL) {
+			printf("%c%s %d %s %s %d %s ", fileType(res.st_mode),\
+					fileMode(res.st_mode), fileNlink(res.st_nlink), \
+					fileOwner(res.st_uid), \
+					fileGroup(res.st_gid), fileSize(res.st_size),\
+					fileTime(res.st_mtim, "%m月 %d %H:%M"));
+
+		} 
+		if (mode & F_ISA){
+			// 
+		} 
+		if (mode & F_ISH) {
+			printf("%dk ", fileBlocks(res.st_blocks));	
+		}
+		printf("%s ", argv[nonoptInd]);
+		printf("\n");
 	}
-
-	printf("%c%s %d %s %s %d %s\n", fileType(res.st_mode), fileMode(res.st_mode), fileNlink(res.st_nlink), fileOwner(res.st_uid), \
-			fileGroup(res.st_gid), fileSize(res.st_size),\
-			fileTime(res.st_mtim, "%m月 %d %H:%M"));
 
 	return 0;
 }
