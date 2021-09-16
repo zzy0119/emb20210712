@@ -7,9 +7,10 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <getopt.h>
 
 #define BUFSIZE		128	
-#define OPTSTRING	"-lah"
+#define OPTSTRING	"-la:h"
 
 #define F_ISL		0001 // -l
 #define F_ISA		0002 // -a
@@ -18,6 +19,7 @@
 
 typedef short opt_t;
 static int nonoptInd;
+static const char *optargP;
 
 // static opt_t mode;
 
@@ -26,17 +28,18 @@ static void setBit(opt_t *opt, int n)
 	*opt = *opt | 1u << n;
 }
 
-static int parseOpt(int argc, char *argv[], opt_t *opt)
+static int parseOpt(int argc, char *argv[], opt_t *opt, const struct option *opts)
 {
 	int c;
 
 	while (1) {
-		c = getopt(argc, argv, OPTSTRING);
+		c = getopt_long(argc, argv, OPTSTRING, opts, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
 			case 'a':
 				setBit(opt, 1);
+				optargP = optarg;
 				break;
 			case 'l':
 				setBit(opt, 0);
@@ -47,6 +50,9 @@ static int parseOpt(int argc, char *argv[], opt_t *opt)
 			case 1:
 				setBit(opt, 3);
 				nonoptInd = optind - 1;
+				break;
+			case 'e':
+				printf("此命令是我第一个带选项的\n");
 				break;
 			default:
 				break;
@@ -139,8 +145,12 @@ int main(int argc, char *argv[])
 {
 	struct stat res;
 	opt_t mode = 0;
+	struct option arr[] = {
+		{"help", no_argument, NULL, 'e'},
+		{0, 0, 0, 0}
+	};
 
-	parseOpt(argc, argv, &mode);
+	parseOpt(argc, argv, &mode, arr);
 
 	if (mode & F_NONOPT) {
 		if (stat(argv[nonoptInd], &res) == -1) {
@@ -163,7 +173,8 @@ int main(int argc, char *argv[])
 
 		} 
 		if (mode & F_ISA){
-			// 
+			if (optargP)	
+				printf("%s ", optargP);
 		} 
 		if (mode & F_ISH) {
 			printf("%dk ", fileBlocks(res.st_blocks));	
