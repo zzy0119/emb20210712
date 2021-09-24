@@ -12,7 +12,8 @@ int main(void)
 	printf("pid:%d, ppid:%d\n", getpid(), \
 			getppid());
 	printf("this is the parent's buffer");
-	pid = fork();
+// 	pid = fork();
+ 	pid = vfork();
 	if (-1 == pid) {
 		perror("fork()");
 		exit(1);
