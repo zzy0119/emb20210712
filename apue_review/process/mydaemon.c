@@ -11,7 +11,11 @@
 #include <fcntl.h>
 #include <syslog.h>
 
+#define LOCKFILE	"/var/run/mydaemon.pid"
+#define BUFSIZE		32
+
 static int daemonInit(void);
+static int runningAlready(void);
 int main(void)
 {
 	int err;
@@ -22,6 +26,12 @@ int main(void)
 	if ((err = daemonInit()) < 0) {
 	//	fprintf(stderr, "daemonInit():%s\n", strerror(-err));
 		syslog(LOG_ERR, "daemonInit():%s", strerror(-err));
+		exit(1);
+	}
+
+	if ((err = runningAlready()) == -1) {
+		syslog(LOG_ERR, "runningAlready():%s", \
+				strerror(-err));	
 		exit(1);
 	}
 
@@ -68,6 +78,34 @@ static int daemonInit(void)
 	for (int i = 3; i < rlimt.rlim_max; i++)
 		close(i);
 
+	return 0;
+}
+// 单实例守护进程
+static int runningAlready(void)
+{
+	int fd;	
+	char buf[BUFSIZE] = {};
+
+	fd = open(LOCKFILE, O_WRONLY | O_CREAT, 0666);
+	ckf(fd, F_TLOCK, 0) == -1) (lockf(fd, F_TLOCK, 0) == -1) (lockf(fd, F_TLOCK, 0) == -1) (lockf(fd, F_TLOCK, 0) == -1) 
+	if (-1 == fd) {
+		syslog(LOG_ERR, "open():%s", strerror(errno));
+		return -1;
+	}
+	if (lockf(fd, F_TLOCK, 0) == -1) {
+		if (errno == EACCES || errno == EAGAIN)	{
+			// 被占用
+			close(fd);		
+			return -1;
+		}
+		syslog(LOG_ERR, "lockf():%s", strerror(errno));
+		return -1;
+	}
+	// 第一次运行
+	ftruncate(fd, 0);	
+	snprintf(buf, BUFSIZE, "%d", getpid());
+	write(fd, buf, strlen(buf)+1);
+	
 	return 0;
 }
 
