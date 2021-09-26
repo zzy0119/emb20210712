@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -8,23 +9,29 @@
 #include <sys/types.h>
 #include <string.h>
 #include <fcntl.h>
-
+#include <syslog.h>
 
 static int daemonInit(void);
 int main(void)
 {
 	int err;
 
+	// 创建连接
+	openlog("mydaemon", LOG_PID, LOG_DAEMON);
+
 	if ((err = daemonInit()) < 0) {
-		fprintf(stderr, "daemonInit():%s\n", strerror(-err));
+	//	fprintf(stderr, "daemonInit():%s\n", strerror(-err));
+		syslog(LOG_ERR, "daemonInit():%s", strerror(-err));
 		exit(1);
 	}
 
 	while (1) {
-		system("ps aux > test.log");	
-		printf("hello\n");
+		system("ps aux > test.log");
+		syslog(LOG_INFO, "test succesfully");
 		sleep(3);
 	}
+
+	closelog();
 
 	exit(0);
 }
@@ -51,7 +58,7 @@ static int daemonInit(void)
 	if (fd == -1)
 		return -errno;
 	dup2(fd, 0);
-//	dup2(fd, 1);
+	dup2(fd, 1);
 	dup2(fd, 2);
 	if (fd > 2)
 		close(fd);
